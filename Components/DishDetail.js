@@ -8,20 +8,20 @@ function RenderDish(props) {
 
     const dish = props.dish;
     
-        if (dish != null) {
-            return(
-                <Card
-                featuredTitle={dish.name}
-                image={require('./images/uthappizza.png')}>
-                    <Text style={{margin: 5}}>
-                        {dish.description}
-                    </Text>
-                </Card>
-            );
-        }
-        else {
-            return(<View></View>);
-        }
+    if (dish != null) {
+        return(
+            <Card
+            featuredTitle={dish.name}
+            image={require('./images/uthappizza.png')}>
+                <Text style={{margin: 5}}>
+                    {dish.description}
+                </Text>
+            </Card>
+        );
+    }
+    else {
+        return(<View></View>);
+    }
 }
 
 class Dishdetail extends React.Component {
