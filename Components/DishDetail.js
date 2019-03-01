@@ -1,6 +1,6 @@
 import React from 'react';
 import { Text, View, ScrollView, FlatList } from 'react-native';
-import { Card } from 'react-native-elements';
+import { Card, ListItem, Icon } from 'react-native-elements';
 import { DISHES } from '../shared/dishes';
 import { COMMENTS } from '../shared/comments';
  
@@ -16,6 +16,16 @@ function RenderDish(props) {
                 <Text style={{margin: 5}}>
                     {dish.description}
                 </Text>
+                
+                <Icon 
+                    raised
+                    reverse
+                    name={ props.favorite ? 'heart' : 'heart-o' }
+                    type='font-awesome'
+                    color='#f50'
+                    onPress = {() => props.favorite ? console.log('Already Favorite') : props.onPress()}
+                />
+
             </Card>
         );
     }
@@ -27,13 +37,25 @@ function RenderDish(props) {
 function RenderComments(props) {
     const comments = props.comments;
 
+    // const RenderCommentItem = ({item,index}) => {
+    //     return (
+    //         <View key={index} style={{margin: 10}}>
+    //             <Text style={{fontSize: 14}}>{item.comment}</Text>
+    //             <Text style={{fontSize: 12}}>{item.rating} Stars</Text>
+    //             <Text style={{fontSize: 12}}>{'--' + item.author + ' , ' + item.date}</Text>
+    //         </View>
+    //     );
+    // }
+
     const RenderCommentItem = ({item,index}) => {
         return (
-            <View key={index} style={{margin: 10}}>
-                <Text style={{fontSize: 14}}>{item.comment}</Text>
-                <Text style={{fontSize: 12}}>{item.rating} Stars</Text>
-                <Text style={{fontSize: 12}}>{'--' + item.author + ' , ' + item.date}</Text>
-            </View>
+            <ListItem 
+                key={index} 
+                title={item.author + ` - ` + item.rating + ' Stars'}
+                subtitle={item.comment} 
+                hideChevrom={true} 
+                leftAvatar = {{source: require('./images/alberto.png')}}
+            />
         );
     }
 
@@ -53,8 +75,13 @@ class Dishdetail extends React.Component {
         super(props);
         this.state = {
             dishes: DISHES,
-            comments: COMMENTS
+            comments: COMMENTS,
+            favorites: []
         };
+    }
+
+    markFavorite(dishId) {
+        this.setState({favorites: this.state.favorites.concat(dishId)});
     }
 
     static navigationOptions = {
@@ -68,7 +95,11 @@ class Dishdetail extends React.Component {
         return (
             //+dishId converts a string to integer 
             <ScrollView>
-                <RenderDish dish={this.state.dishes[+dishId]} />
+                <RenderDish 
+                    dish={this.state.dishes[+dishId]} 
+                    favorite={this.state.favorites.some(el => el ===dishId)}
+                    onPress= {() =>this.markFavorite(dishId)}
+                />
                 <RenderComments comments={this.state.comments.filter((comment) => comment.dishId ===dishId)} />
             </ScrollView>
 
