@@ -1,41 +1,66 @@
 import React from 'react';
 import { Text, View, ScrollView } from 'react-native';
 import { Card } from 'react-native-elements';
-import {DISHES} from '../shared/dishes';
-import {PROMOTIONS} from '../shared/promotions';
-import {LEADERS} from '../shared/leaders';
+// import {DISHES} from '../shared/dishes';
+// import {PROMOTIONS} from '../shared/promotions';
+// import {LEADERS} from '../shared/leaders';
+import { connect } from 'react-redux';
+import { baseUrl } from '../shared/baseUrl';
+import { Loading } from './Loading';
+
+const mapStateToProps = (state) => {
+    return {
+        leaders: state.leaders,
+        dishes: state.dishes,
+        promotions: state.promotions
+    }
+}
 
 function RenderItem(props) {
     
     const item = props.item;
     
-    if (item != null) {
-        return(
-            <Card
-                featuredTitle={item.name}
-                featuredSubtitle={item.designation}
-                image={require('./images/uthappizza.png')}>
-                <Text
-                    style={{margin: 10}}>
-                    {item.description}</Text>
-            </Card>
+    if(props.isLoading) {
+        return (
+            <Loading />
         );
     }
-    else {
-        return(<View></View>);
+    else if(props.errMess) {
+        return (
+            <View> 
+                <Text style={{"textAlign": "center","paddingTop": 10}}>{props.errMess}</Text>
+            </View>
+        )
     }
+    else {
+        if (item != null) {
+            return(
+                <Card
+                    featuredTitle={item.name}
+                    featuredSubtitle={item.designation}
+                    image={{uri: item.image}}>
+                    <Text
+                        style={{margin: 10}}>
+                        {item.description}</Text>
+                </Card>
+            );
+        }
+        else {
+            return(<View></View>);
+        }
+    }    
 }
 
 class Home extends React.Component {
 
-    constructor(props) {
-        super(props);
-        this.state = {
-          dishes: DISHES,
-          promotions: PROMOTIONS,
-          leaders: LEADERS
-        };
-    }
+    // constructor(props) {
+    //     super(props);
+    //     this.state = {
+    //       dishes: DISHES,
+    //       promotions: PROMOTIONS,
+    //       leaders: LEADERS
+    //     };
+    // }
 
     static navigationOptions = {
         title: 'Home'
@@ -44,12 +69,24 @@ class Home extends React.Component {
     render() {
         return (
             <ScrollView>
-                <RenderItem item = {this.state.dishes.filter((dish) => dish.featured)[0]} />
-                <RenderItem item = {this.state.promotions.filter((promo) => promo.featured)[0]} />
-                <RenderItem item = {this.state.leaders.filter((leader) => leader.featured)[0]} />
+                <RenderItem 
+                    item = {this.props.dishes.dishes.filter((dish) => dish.featured)[0]}
+                    isLoading={this.props.dishes.isLoading}
+                    errMess={this.props.dishes.errMess}
+                />
+                <RenderItem 
+                    item = {this.props.promotions.promotions.filter((promo) => promo.featured)[0]} 
+                    isLoading={this.props.promotions.isLoading}
+                    errMess={this.props.promotions.errMess}    
+                />
+                <RenderItem 
+                    item = {this.props.leaders.leaders.filter((leader) => leader.featured)[0]} 
+                    isLoading={this.props.leaders.isLoading}
+                    errMess={this.props.leaders.errMess}
+                />
             </ScrollView>
         );
     }
 }
 
-export default Home;
+export default connect(mapStateToProps)(Home);
